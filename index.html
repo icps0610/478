@@ -3,15 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4-7-8 呼吸法練習</title>
+    <title>4-7-8 呼吸冥想 (語義音效版)</title>
     <style>
         :root {
-            --bg-color: #1a1a1a;
-            --text-color: #ffffff;
-            --accent-color: #4facfe;
-            --circle-bg: #333;
-            --circle-inner: #00f260;
-            --panel-bg: #2d2d2d;
+            /* 核心色彩定義 */
+            --bg-gradient: radial-gradient(circle at center, #2a2d3e 0%, #13151a 100%);
+            --text-color: #e0e0e0;
+            --text-muted: #888aa0;
+            
+            /* 呼吸環色彩 */
+            --circle-outer-border: rgba(255, 255, 255, 0.08);
+            --circle-outer-glow: 0 0 30px rgba(79, 172, 254, 0.2);
+            --circle-inner-bg: radial-gradient(circle, rgba(0, 242, 96, 0.9) 0%, rgba(5, 117, 230, 0.7) 90%);
+            --circle-inner-glow: 0 0 50px rgba(5, 117, 230, 0.5);
+
+            /* UI 元素色彩 */
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f260 100%);
+            --button-shadow: 0 10px 20px -10px rgba(79, 172, 254, 0.5);
+            --panel-bg: rgba(40, 44, 52, 0.85);
+            --panel-border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         body {
@@ -20,11 +30,12 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: var(--bg-color);
+            min-height: 100vh;
+            background: var(--bg-gradient);
             color: var(--text-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             overflow: hidden;
+            letter-spacing: 0.5px;
         }
 
         /* 主容器 */
@@ -33,110 +44,137 @@
             position: relative;
             width: 100%;
             max-width: 500px;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        /* 呼吸圓圈區域 */
+        /* --- 呼吸圓圈核心區域 --- */
         .breathing-circle-wrapper {
             position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 0 auto 30px auto;
+            width: 320px;
+            height: 320px;
+            margin: 0 auto 40px auto;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* 外圈 (固定) */
+        /* 外圈 (固定裝飾) */
         .outer-circle {
             position: absolute;
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 4px solid var(--circle-bg);
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border: 2px solid var(--circle-outer-border);
+            box-shadow: var(--circle-outer-glow), inset 0 0 20px rgba(0,0,0,0.2);
             z-index: 1;
         }
 
-        /* 內圈 (動畫) */
+        /* 內圈 (動畫主體) */
         .inner-circle {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, var(--circle-inner), #0575e6);
+            width: 92%;
+            height: 92%;
+            background: var(--circle-inner-bg);
             border-radius: 50%;
-            transform: scale(0); /* 初始狀態：不可見/極小 */
-            opacity: 0.9;
+            transform: scale(0); 
+            opacity: 0.95;
             z-index: 2;
             will-change: transform;
+            box-shadow: var(--circle-inner-glow);
+            transition-timing-function: ease-in-out !important; 
         }
 
         /* 文字提示 */
         .status-text {
             position: absolute;
             z-index: 3;
-            font-size: 2rem;
-            font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
             pointer-events: none;
         }
         
+        /* 計時器大數字 */
         .timer-display {
-            font-size: 5rem;
-            font-weight: 300;
-            margin-bottom: 20px;
+            font-size: 6rem;
+            font-weight: 200;
+            margin-bottom: 30px;
             font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
         }
 
-        /* 控制按鈕 */
+        /* --- 控制按鈕區域 --- */
         .controls {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
             margin-top: 20px;
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--accent-gradient);
             border: none;
-            padding: 12px 24px;
+            padding: 14px 32px;
             color: white;
-            font-size: 1rem;
-            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 16px;
             cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             outline: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: var(--button-shadow);
+            letter-spacing: 1px;
         }
 
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -10px rgba(79, 172, 254, 0.7);
+        }
+        
         button:active {
-            transform: scale(0.95);
+            transform: translateY(-1px) scale(0.98);
         }
 
+        /* 次要按鈕樣式 */
         button.secondary {
-            background: #444;
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
+        button.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         button:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
         }
 
-        /* 設定面板 */
+        /* --- 設定面板 (毛玻璃效果) --- */
         .settings-panel {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.9);
             background-color: var(--panel-bg);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: var(--panel-border);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             z-index: 10;
-            width: 80%;
-            max-width: 320px;
+            width: 85%;
+            max-width: 340px;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s, transform 0.3s;
+            transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .settings-panel.active {
@@ -147,41 +185,52 @@
 
         .settings-panel h2 {
             margin-top: 0;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             text-align: center;
+            font-weight: 400;
+            letter-spacing: 1px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: left;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-            color: #ccc;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
         .form-group input {
             width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #555;
-            background: #222;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
             color: white;
-            font-size: 1rem;
+            font-size: 1.1rem;
             box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            outline: none;
+        }
+        
+        .form-group input:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2);
         }
 
         .overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
             z-index: 9;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s;
+            transition: opacity 0.4s ease;
         }
         .overlay.active {
             opacity: 1;
@@ -190,9 +239,19 @@
 
         /* 進度指示 */
         .cycle-info {
-            margin-top: 10px;
+            margin-top: 25px;
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* 錯誤提示 */
+        .error-msg {
+            display: none;
+            color: #ff6b6b;
             font-size: 0.9rem;
-            color: #888;
+            margin-top: 10px;
         }
 
     </style>
@@ -214,103 +273,75 @@
         </div>
         
         <div class="cycle-info" id="cycleInfo">循環: 0 / 6</div>
+        <div class="error-msg" id="errorMsg">注意：找不到音效檔案 (inhale.mp3 等)</div>
     </div>
 
     <div class="overlay" id="overlay"></div>
     <div class="settings-panel" id="settingsPanel">
         <h2>參數設定</h2>
         <div class="form-group">
-            <label>階段一 (變大) 秒數</label>
+            <label>吸氣秒數 (變大)</label>
             <input type="number" id="inputP1" value="4" min="1">
         </div>
         <div class="form-group">
-            <label>階段二 (縮小消失) 秒數</label>
+            <label>屏氣/吐氣秒數 (縮小)</label>
             <input type="number" id="inputP2" value="7" min="1">
         </div>
         <div class="form-group">
-            <label>階段三 (變大) 秒數</label>
+            <label>吐氣/吸氣秒數 (變大)</label>
             <input type="number" id="inputP3" value="8" min="1">
         </div>
         <div class="form-group">
             <label>循環次數</label>
             <input type="number" id="inputCycles" value="6" min="1">
         </div>
-        <div class="controls">
-            <button id="btnSave">儲存並關閉</button>
+        <div class="controls" style="margin-top: 30px;">
+            <button id="btnSave" style="width: 100%;">儲存並關閉</button>
         </div>
     </div>
 
     <script>
-        // 音效控制器 (Web Audio API)
+        // 音效控制器 (語義化檔案名稱)
         class AudioController {
             constructor() {
-                this.ctx = null;
-            }
-
-            init() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-            }
-
-            // 叮聲 (Sine wave, High pitch)
-            playDing() {
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
+                // 定義音效路徑 (對應呼吸階段)
+                this.files = {
+                    inhale: 'inhale.mp3', // 吸氣階段結束 (Sound 1)
+                    hold: 'hold.mp3',     // 屏氣階段結束 (Sound 2)
+                    exhale: 'exhale.mp3'  // 吐氣階段結束 / 開始提示 (Sound 3)
+                };
                 
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, this.ctx.currentTime); // A5
-                osc.frequency.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 1.5);
-
-                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.2);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 1.5);
-            }
-
-            // 鼓聲 (Low frequency, Noise-like decay)
-            playDrum() {
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(100, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.5);
-
-                gain.gain.setValueAtTime(0.6, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.5);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.5);
-            }
-
-            // 喀喀聲 (Click/Woodblock)
-            playClick() {
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                this.audioObjects = {};
                 
-                // 很短促的聲音
-                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+                // 預載入音效
+                try {
+                    this.audioObjects['inhale'] = new Audio(this.files.inhale);
+                    this.audioObjects['hold'] = new Audio(this.files.hold);
+                    this.audioObjects['exhale'] = new Audio(this.files.exhale);
+                    
+                    // 綁定錯誤處理
+                    Object.values(this.audioObjects).forEach(audio => {
+                        audio.addEventListener('error', (e) => {
+                            console.error("音效載入失敗", e);
+                            document.getElementById('errorMsg').style.display = 'block';
+                        });
+                    });
 
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.1);
+                } catch (e) {
+                    console.error("音效初始化失敗", e);
+                }
+            }
+
+            // 播放指定音效
+            play(key) {
+                const sound = this.audioObjects[key];
+                if (sound) {
+                    // 重置時間以允許快速連點或重複播放
+                    sound.currentTime = 0;
+                    sound.play().catch(e => {
+                        console.log("播放被瀏覽器阻擋 (需先與頁面互動)", e);
+                    });
+                }
             }
         }
 
@@ -341,7 +372,7 @@
             p1: 4, // 秒
             p2: 7,
             p3: 8,
-            cycles: 4
+            cycles: 6
         };
         
         let state = {
@@ -358,11 +389,11 @@
             els.btnStart.addEventListener('click', toggleStart);
             els.btnSettings.addEventListener('click', openSettings);
             els.btnSave.addEventListener('click', saveSettings);
-            els.overlay.addEventListener('click', closeSettings); // 點擊背景關閉
+            els.overlay.addEventListener('click', closeSettings);
         }
 
         function openSettings() {
-            if (state.isRunning) return; // 執行中不可設定
+            if (state.isRunning) return;
             els.settingsPanel.classList.add('active');
             els.overlay.classList.add('active');
         }
@@ -376,7 +407,7 @@
             config.p1 = parseInt(els.inputs.p1.value) || 4;
             config.p2 = parseInt(els.inputs.p2.value) || 7;
             config.p3 = parseInt(els.inputs.p3.value) || 8;
-            config.cycles = parseInt(els.inputs.cycles.value) || 4;
+            config.cycles = parseInt(els.inputs.cycles.value) || 6;
             updateCycleDisplay();
             closeSettings();
         }
@@ -394,17 +425,22 @@
         }
 
         function startBreathing() {
-            audio.init(); // 啟動音效環境
             state.isRunning = true;
             state.currentCycle = 0;
-            els.btnStart.textContent = '停止';
-            els.btnStart.style.background = '#e53935';
+            els.btnStart.textContent = '停止練習';
+            els.btnStart.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%)';
+            els.btnStart.style.boxShadow = '0 10px 20px -10px rgba(255, 107, 107, 0.5)';
+
             els.btnSettings.disabled = true;
+            document.getElementById('errorMsg').style.display = 'none';
             
             // 重置圓圈
             els.innerCircle.style.transition = 'none';
             els.innerCircle.style.transform = 'scale(0)'; 
             
+            // ★ 開始提示音：播放 exhale.mp3 (代表上一輪吐氣結束，提示開始吸氣)
+            audio.play('exhale');
+
             // 開始循環
             runCycle();
         }
@@ -415,11 +451,12 @@
             cancelAnimationFrame(state.animationFrame);
             
             els.btnStart.textContent = '開始練習';
-            els.btnStart.style.background = '';
+            els.btnStart.style.background = ''; 
+            els.btnStart.style.boxShadow = '';
             els.btnSettings.disabled = false;
             els.statusText.textContent = '準備';
             els.timerDisplay.textContent = '0';
-            els.innerCircle.style.transition = 'transform 0.5s ease';
+            els.innerCircle.style.transition = 'transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1)';
             els.innerCircle.style.transform = 'scale(0)';
         }
 
@@ -434,44 +471,36 @@
             }
             updateCycleDisplay();
 
-            // 階段一：慢慢變大 (4秒) -> 叮聲
-            // 注意：如果上一輪結束是變大(Scale 1)，這裡要先瞬間歸零再變大，或是依據需求。
-            // 根據描述：階段3結束是"變大"，階段1開始是"變大"。
-            // 為了視覺連續性，我們假設階段1是從無到有。
-            
-            // Reset to 0 instantly before starting P1 (因為 P3 結束是滿的，P1 開始是從小變大)
+            // 階段一：慢慢變大 (吸氣) -> 結束播放 inhale.mp3
             els.innerCircle.style.transition = 'none';
             els.innerCircle.style.transform = 'scale(0)';
-            
-            // 強制 Reflow 以應用上面的 style
-            void els.innerCircle.offsetWidth;
+            void els.innerCircle.offsetWidth; // 強制 Reflow
 
-            await runPhase('吸氣', config.p1, 'scale(1)', 'ding');
+            await runPhase('吸氣', config.p1, 'scale(1)', 'inhale');
             if (!state.isRunning) return;
 
-            // 階段二：慢慢縮小 (7秒) -> 鼓聲
-            await runPhase('暫停', config.p2, 'scale(0)', 'drum');
+            // 階段二：慢慢縮小 (屏氣) -> 結束播放 hold.mp3
+            await runPhase('屏氣', config.p2, 'scale(0)', 'hold');
             if (!state.isRunning) return;
 
-            // 階段三：慢慢變大 (8秒) -> 喀喀聲
-            await runPhase('吐氣', config.p3, 'scale(1)', 'click');
+            // 階段三：慢慢變大 (吐氣) -> 結束播放 exhale.mp3
+            await runPhase('吐氣', config.p3, 'scale(1)', 'exhale');
             if (!state.isRunning) return;
 
             // 遞迴調用下一輪
             runCycle();
         }
 
-        function runPhase(text, durationSec, cssTransform, soundType) {
+        function runPhase(text, durationSec, cssTransform, soundKey) {
             return new Promise(resolve => {
                 els.statusText.textContent = text;
                 
                 // 設定 CSS Transition
-                els.innerCircle.style.transition = `transform ${durationSec}s linear`;
+                els.innerCircle.style.transition = `transform ${durationSec}s cubic-bezier(0.42, 0, 0.58, 1)`;
                 els.innerCircle.style.transform = cssTransform;
 
                 let startTime = Date.now();
                 
-                // 倒數計時顯示 UI Loop
                 function updateTimer() {
                     if (!state.isRunning) return;
                     
@@ -484,23 +513,14 @@
                     if (elapsed < durationSec) {
                         state.animationFrame = requestAnimationFrame(updateTimer);
                     } else {
-                        // 階段結束
-                        playSound(soundType);
+                        // 階段結束，播放對應音效
+                        audio.play(soundKey);
                         resolve();
                     }
                 }
                 
                 state.animationFrame = requestAnimationFrame(updateTimer);
             });
-        }
-
-        function playSound(type) {
-            if (!state.isRunning) return;
-            switch(type) {
-                case 'ding': audio.playDing(); break;
-                case 'drum': audio.playDrum(); break;
-                case 'click': audio.playClick(); break;
-            }
         }
 
         // 啟動
