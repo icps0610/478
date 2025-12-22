@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4-7-8 呼吸冥想</title>
+    <title>4-7-8 呼吸冥想 (語義音效版)</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌬️</text></svg>">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -339,9 +339,9 @@
             constructor() {
                 // 定義音效路徑 (對應呼吸階段)
                 this.files = {
-                    inhale: 'inhale.mp3', // 吸氣階段結束
-                    hold: 'hold.mp3',     // 屏氣階段結束
-                    exhale: 'exhale.mp3'  // 吐氣階段結束
+                    inhale: 'inhale.mp3', // 吸氣階段結束 (Sound 1)
+                    hold: 'hold.mp3',     // 屏氣階段結束 (Sound 2)
+                    exhale: 'exhale.mp3'  // 吐氣階段結束 / 開始提示 (Sound 3)
                 };
                 
                 this.audioObjects = {};
@@ -390,4 +390,178 @@
             btnSettings: document.getElementById('btnSettings'),
             cycleInfo: document.getElementById('cycleInfo'),
             settingsPanel: document.getElementById('settingsPanel'),
-            overlay: document.
+            overlay: document.getElementById('overlay'),
+            btnSave: document.getElementById('btnSave'),
+            inputs: {
+                p1: document.getElementById('inputP1'),
+                p2: document.getElementById('inputP2'),
+                p3: document.getElementById('inputP3'),
+                cycles: document.getElementById('inputCycles'),
+            }
+        };
+
+        // 狀態變數
+        let config = {
+            p1: 4, // 秒
+            p2: 7,
+            p3: 8,
+            cycles: 6
+        };
+        
+        let state = {
+            isRunning: false,
+            currentCycle: 0,
+            timer: null,
+            animationFrame: null,
+            phaseStartTime: 0
+        };
+
+        // 初始化
+        function init() {
+            updateCycleDisplay();
+            els.btnStart.addEventListener('click', toggleStart);
+            els.btnSettings.addEventListener('click', openSettings);
+            els.btnSave.addEventListener('click', saveSettings);
+            els.overlay.addEventListener('click', closeSettings);
+        }
+
+        function openSettings() {
+            if (state.isRunning) return;
+            els.settingsPanel.classList.add('active');
+            els.overlay.classList.add('active');
+        }
+
+        function closeSettings() {
+            els.settingsPanel.classList.remove('active');
+            els.overlay.classList.remove('active');
+        }
+
+        function saveSettings() {
+            config.p1 = parseInt(els.inputs.p1.value) || 4;
+            config.p2 = parseInt(els.inputs.p2.value) || 7;
+            config.p3 = parseInt(els.inputs.p3.value) || 8;
+            config.cycles = parseInt(els.inputs.cycles.value) || 6;
+            updateCycleDisplay();
+            closeSettings();
+        }
+
+        function toggleStart() {
+            if (state.isRunning) {
+                stopBreathing();
+            } else {
+                startBreathing();
+            }
+        }
+
+        function updateCycleDisplay() {
+            // 使用 innerHTML 來保留圖示
+            els.cycleInfo.innerHTML = `<i class="fas fa-sync-alt"></i> 循環: ${state.currentCycle} / ${config.cycles}`;
+        }
+
+        function startBreathing() {
+            state.isRunning = true;
+            state.currentCycle = 0;
+            // 更新按鈕狀態 (帶入停止圖示)
+            els.btnStart.innerHTML = '<i class="fas fa-stop"></i> 停止練習';
+            els.btnStart.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%)';
+            els.btnStart.style.boxShadow = '0 10px 20px -10px rgba(255, 107, 107, 0.5)';
+
+            els.btnSettings.disabled = true;
+            document.getElementById('errorMsg').style.display = 'none';
+            
+            // 重置圓圈
+            els.innerCircle.style.transition = 'none';
+            els.innerCircle.style.transform = 'scale(0)'; 
+            
+            // ★ 開始提示音
+            audio.play('exhale');
+
+            // 開始循環
+            runCycle();
+        }
+
+        function stopBreathing() {
+            state.isRunning = false;
+            clearTimeout(state.timer);
+            cancelAnimationFrame(state.animationFrame);
+            
+            // 更新按鈕狀態 (帶入播放圖示)
+            els.btnStart.innerHTML = '<i class="fas fa-play"></i> 開始練習';
+            els.btnStart.style.background = ''; 
+            els.btnStart.style.boxShadow = '';
+            els.btnSettings.disabled = false;
+            els.statusText.textContent = '準備';
+            els.timerDisplay.textContent = '0';
+            els.innerCircle.style.transition = 'transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1)';
+            els.innerCircle.style.transform = 'scale(0)';
+        }
+
+        async function runCycle() {
+            if (!state.isRunning) return;
+            
+            state.currentCycle++;
+            if (state.currentCycle > config.cycles) {
+                stopBreathing();
+                els.statusText.textContent = '完成';
+                return;
+            }
+            updateCycleDisplay();
+
+            // 階段一：慢慢變大 (吸氣)
+            els.innerCircle.style.transition = 'none';
+            els.innerCircle.style.transform = 'scale(0)';
+            void els.innerCircle.offsetWidth; // 強制 Reflow
+
+            await runPhase('吸氣', config.p1, 'scale(1)', 'inhale');
+            if (!state.isRunning) return;
+
+            // 階段二：慢慢縮小 (屏氣)
+            await runPhase('屏氣', config.p2, 'scale(0)', 'hold');
+            if (!state.isRunning) return;
+
+            // 階段三：慢慢變大 (吐氣)
+            await runPhase('吐氣', config.p3, 'scale(1)', 'exhale');
+            if (!state.isRunning) return;
+
+            // 遞迴調用下一輪
+            runCycle();
+        }
+
+        function runPhase(text, durationSec, cssTransform, soundKey) {
+            return new Promise(resolve => {
+                els.statusText.textContent = text;
+                
+                // 設定 CSS Transition
+                els.innerCircle.style.transition = `transform ${durationSec}s cubic-bezier(0.42, 0, 0.58, 1)`;
+                els.innerCircle.style.transform = cssTransform;
+
+                let startTime = Date.now();
+                
+                function updateTimer() {
+                    if (!state.isRunning) return;
+                    
+                    let elapsed = (Date.now() - startTime) / 1000;
+                    let remaining = Math.ceil(durationSec - elapsed);
+                    
+                    if (remaining < 0) remaining = 0;
+                    els.timerDisplay.textContent = remaining;
+
+                    if (elapsed < durationSec) {
+                        state.animationFrame = requestAnimationFrame(updateTimer);
+                    } else {
+                        // 階段結束，播放對應音效
+                        audio.play(soundKey);
+                        resolve();
+                    }
+                }
+                
+                state.animationFrame = requestAnimationFrame(updateTimer);
+            });
+        }
+
+        // 啟動
+        init();
+
+    </script>
+</body>
+</html>
