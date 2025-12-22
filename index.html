@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4-7-8 呼吸冥想</title>
+    <title>4-7-8 呼吸冥想 (語義音效版)</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌬️</text></svg>">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -311,15 +311,15 @@
     <div class="settings-panel" id="settingsPanel">
         <h2><i class="fas fa-cog"></i> 參數設定</h2>
         <div class="form-group">
-            <label>吸氣秒數 (變大)</label>
+            <label>吸氣秒數</label>
             <input type="number" id="inputP1" value="4" min="1">
         </div>
         <div class="form-group">
-            <label>屏氣/吐氣秒數 (縮小)</label>
+            <label>停留</label>
             <input type="number" id="inputP2" value="7" min="1">
         </div>
         <div class="form-group">
-            <label>吐氣/吸氣秒數 (變大)</label>
+            <label>吐氣</label>
             <input type="number" id="inputP3" value="8" min="1">
         </div>
         <div class="form-group">
@@ -339,9 +339,9 @@
             constructor() {
                 // 定義音效路徑 (對應呼吸階段)
                 this.files = {
-                    inhale: 'inhale.mp3', // 吸氣階段結束 (Sound 1)
-                    hold: 'hold.mp3',     // 屏氣階段結束 (Sound 2)
-                    exhale: 'exhale.mp3'  // 吐氣階段結束 / 開始提示 (Sound 3)
+                    inhale: 'inhale.mp3', // 吸氣階段結束
+                    hold: 'hold.mp3',     // 停留階段結束
+                    exhale: 'exhale.mp3'  // 吐氣階段結束
                 };
                 
                 this.audioObjects = {};
@@ -516,7 +516,7 @@
             if (!state.isRunning) return;
 
             // 階段二：慢慢縮小 (屏氣)
-            await runPhase('屏氣', config.p2, 'scale(0)', 'hold');
+            await runPhase('停留', config.p2, 'scale(0)', 'hold');
             if (!state.isRunning) return;
 
             // 階段三：慢慢變大 (吐氣)
