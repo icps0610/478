@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>4-7-8 呼吸冥想</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌬️</text></svg>">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
             /* 核心色彩定義 */
@@ -400,11 +398,11 @@
             }
         };
 
-        // 狀態變數
+        // 狀態變數 (預設值)
         let config = {
-            p1: 4, // 秒
-            p2: 7,
-            p3: 8,
+            p1: 4, // 吸氣
+            p2: 7, // 停留
+            p3: 8, // 吐氣
             cycles: 6
         };
         
@@ -416,9 +414,34 @@
             phaseStartTime: 0
         };
 
+        // --- 本地儲存功能 ---
+        const STORAGE_KEY = 'breathing_app_config';
+
+        function loadSettings() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                try {
+                    const parsedConfig = JSON.parse(savedData);
+                    // 覆蓋預設設定
+                    config = { ...config, ...parsedConfig };
+                    console.log('已讀取儲存的設定:', config);
+                } catch (e) {
+                    console.error('設定讀取失敗，使用預設值', e);
+                }
+            }
+            
+            // 同步 UI：把設定值填回輸入框
+            els.inputs.p1.value = config.p1;
+            els.inputs.p2.value = config.p2;
+            els.inputs.p3.value = config.p3;
+            els.inputs.cycles.value = config.cycles;
+        }
+
         // 初始化
         function init() {
+            loadSettings(); // ★ 啟動時先載入設定
             updateCycleDisplay();
+            
             els.btnStart.addEventListener('click', toggleStart);
             els.btnSettings.addEventListener('click', openSettings);
             els.btnSave.addEventListener('click', saveSettings);
@@ -427,6 +450,12 @@
 
         function openSettings() {
             if (state.isRunning) return;
+            // 每次打開設定時，確保輸入框顯示的是當前 config 的值
+            els.inputs.p1.value = config.p1;
+            els.inputs.p2.value = config.p2;
+            els.inputs.p3.value = config.p3;
+            els.inputs.cycles.value = config.cycles;
+            
             els.settingsPanel.classList.add('active');
             els.overlay.classList.add('active');
         }
@@ -437,10 +466,15 @@
         }
 
         function saveSettings() {
+            // 更新 config 物件
             config.p1 = parseInt(els.inputs.p1.value) || 4;
             config.p2 = parseInt(els.inputs.p2.value) || 7;
             config.p3 = parseInt(els.inputs.p3.value) || 8;
             config.cycles = parseInt(els.inputs.cycles.value) || 6;
+            
+            // ★ 儲存到 localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+            
             updateCycleDisplay();
             closeSettings();
         }
